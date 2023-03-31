@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter,Hashrouter,Route,Link,Routes,Outlet } from 'react-router-dom'
+import { BrowserRouter,HashRouter,Route,Link,Routes,Outlet } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
@@ -11,7 +11,7 @@ import About from './pages/about'
 
 function App() {
     return (
-        <Hashrouter>
+        <HashRouter>
             <div className="App">
                 <h1>APP test1</h1>
                 {/*<ThemeProvider>
@@ -33,7 +33,7 @@ function App() {
                     <Route path="/contact" element={<Contact/>} />
                 </Routes>*/}
             </div>
-        </Hashrouter>
+        </HashRouter>
 
     );
 }
