@@ -1,4 +1,4 @@
-import {Route, Routes,Switch} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import React from "react";
 
 import Home from "../pages/home";
@@ -9,13 +9,13 @@ import MuiPlay from "../pages/mui";
 
 export const HomeRouter = () => {
     return <>
-        <Switch>
-            <Route path="/" element={<Home/>} />
-            <Route path="/about" element={<About/>} />
+        <Routes>
+            <Route path="/" element={<Home/>}/>
+            <Route path="/about" element={<About/>}/>
             <Route path='/contact' element={<Contact/>}/>
             <Route path='/play' element={<Play/>}/>
             <Route path='/mui' element={<MuiPlay/>}/>
-        </Switch>
+        </Routes>
 
     </>
 }
