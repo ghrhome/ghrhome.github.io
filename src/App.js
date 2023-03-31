@@ -13,7 +13,7 @@ function App() {
     return (
         <HashRouter>
             <div className="App">
-                <h1>APP test1</h1>
+                <h1>Ghrhome.IO</h1>
                 {/*<ThemeProvider>
                      CssBaseline kickstart an elegant, consistent, and simple baseline to build upon.
                     <CssBaseline />
