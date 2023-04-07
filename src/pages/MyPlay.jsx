@@ -98,7 +98,6 @@ export default function MyPlay() {
         utterThis.volume = volume;
         synth.speak(utterThis);
         //setVoice(utterThis);
-
     }
 
     return (
