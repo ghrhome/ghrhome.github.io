@@ -1,171 +1,182 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import {
-    DragDropContext,
-    Draggable,
-    DraggableProvided,
-    DraggableRubric,
-    DraggableStateSnapshot,
-    DragStart,
-    DragUpdate,
-    Droppable,
-    DropResult,
-    ResponderProvided,
-} from "react-beautiful-dnd";
+import { v4 as uuidv4 } from "uuid";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-import "./dnd/style.css";
+const initialItems = [
+    { id: "1", content: "Item 1" },
+    { id: "2", content: "Item 2" },
+    { id: "3", content: "Item 3" },
+    { id: "4", content: "Item 4" },
+];
 
-/*interface IItem {
-    id: string;
-    label: string;
-}*/
-
-export  const DndForm = () => {
-    const COLLECTION = [
-        { id: "1", label: "Apple" },
-        { id: "2", label: "Banana" },
-        { id: "3", label: "orange" },
-    ];
-    const [items, setItems] = useState(COLLECTION);
-    const [enabled, setEnabled] = React.useState(false);
-    React.useEffect(() => {
-        const animation = requestAnimationFrame(() => setEnabled(true));
-
-        return () => {
-            cancelAnimationFrame(animation);
-            setEnabled(false);
-        };
-    }, []);
-    const onDragStart = (start, provided) => {
-        console.log("onDragStart", start, provided);
-    };
-    const onDragUpdate = (update, provided) => {
-        console.log("onDragUpdate", update, provided);
-    };
-    const onDragEnd = (result, provided) => {
-        console.log("onDragEnd", result, provided);
-    };
-
-    const getRenderItem =
-        (items) =>
-            (
-                provided,
-                snapshot,
-                rubric
-            ) => {
-                const item = items[rubric.source.index];
-                return (
-                    <React.Fragment>
-                        <li
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            style={provided.draggableProps.style}
-                            className={snapshot.isDragging ? "dragging" : ""}
-                        >
-                            {item.label}
-                        </li>
-                    </React.Fragment>
-                );
-            };
+const TaskItem = ({ task, index, deleteTask }) => {
     return (
-        <DragDropContext
-            onDragStart={onDragStart}
-            onDragUpdate={onDragUpdate}
-            onDragEnd={onDragEnd}
-        >
-            {enabled && (
-                <Wrapper>
-                    <Droppable
-                        droppableId="tools"
-                        renderClone={getRenderItem(COLLECTION)}
-                        isDropDisabled
-                    >
-                        {(provided, snapshot) => {
-                            return (
-                                <LeftWapper
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                >
-                                    <ul ref={provided.innerRef} className="shop">
-                                        {items.map((item, index) => {
-                                            const shouldRenderClone =
-                                                item.id === snapshot.draggingFromThisWith;
-                                            return (
-                                                <React.Fragment key={item.id}>
-                                                    {shouldRenderClone ? (
-                                                        <li className="react-beatiful-dnd-copy">
-                                                            {item.label}
-                                                        </li>
-                                                    ) : (
-                                                        <Draggable draggableId={item.id} index={index}>
-                                                            {(provided, snapshot) => (
-                                                                <React.Fragment>
-                                                                    <li
-                                                                        ref={provided.innerRef}
-                                                                        {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps}
-                                                                        className={
-                                                                            snapshot.isDragging ? "dragging" : ""
-                                                                        }
-                                                                    >
-                                                                        {item.label}
-                                                                    </li>
-                                                                </React.Fragment>
-                                                            )}
-                                                        </Draggable>
-                                                    )}
-                                                </React.Fragment>
-                                            );
-                                        })}
-                                    </ul>
-                                </LeftWapper>
-                            );
-                        }}
-                    </Droppable>
-
-                    <Droppable droppableId="form">
-                        {(provided, snapshot) => {
-                            return (
-                                <MiddleWrapper
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                ></MiddleWrapper>
-                            );
-                        }}
-                    </Droppable>
-                    <RightWrapper></RightWrapper>
-                </Wrapper>
-            )}
-        </DragDropContext>
+        <div className="task-item">
+            <div className="task-content">{task.content}</div>
+            <button className="delete-button" onClick={() => deleteTask(index)}>删除</button>
+        </div>
     );
 };
 
-const Wrapper = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: #6dc1e6;
-  display: flex;
-  justify-content: space-between;
-`;
+const App = () => {
+    const [items1] = useState(initialItems);
+    const [items2, setItems2] = useState([]);
 
-const LeftWapper = styled.div`
-  width: 350px;
-  height: 100%;
-  background-color: aquamarine;
-  flex-shrink: 0;
-`;
+    const onDragEnd = (result) => {
+        const { source, destination } = result;
 
-const MiddleWrapper = styled.div`
-  min-width: 500px;
-  flex-grow: 10;
-`;
+        if (!destination) {
+            return;
+        }
 
-const RightWrapper = styled.div`
-  width: 300px;
-  height: 100%;
-  background-color: #e8d4ba;
-`;
+        if (source.droppableId === destination.droppableId) {
+            const items = reorderList(
+                getItemList(source.droppableId),
+                source.index,
+                destination.index
+            );
+            setItemList(source.droppableId, items);
+        } else {
+            const sourceItems = getItemList(source.droppableId);
+            const destItems = getItemList(destination.droppableId);
 
-export default DndForm;
+            if (source.droppableId === "list1") {
+                const item = sourceItems[source.index];
+                const newItem = { ...item, id: uuidv4() };
+                setItems2((items) => [...items, newItem]);
+            } else {
+                const result = moveItem(sourceItems, destItems, source, destination);
+                setItemList(source.droppableId, result[source.droppableId]);
+                setItemList(destination.droppableId, result[destination.droppableId]);
+            }
+        }
+    };
+
+    const onDelete = (item) => {
+        setItems2((items) => items.filter((i) => i.id !== item.id));
+    };
+
+    const getItemList = (id) => {
+        return id === "list1" ? items1 : items2;
+    };
+
+    const setItemList = (id, items) => {
+        if (id === "list1") {
+            return;
+        }
+        setItems2(items);
+    };
+
+    const reorderList = (list, startIndex, endIndex) => {
+        const result = Array.from(list);
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        return result;
+    };
+
+    const moveItem = (source, destination, droppableSource, droppableDestination) => {
+        const sourceClone = Array.from(source);
+        const destClone = Array.from(destination);
+        const [removed] = sourceClone.splice(droppableSource.index, 1);
+        destClone.splice(droppableDestination.index, 0, removed);
+
+    }
+
+        const onDeleteAll = () => {
+            setItems2([]);
+        };
+
+        return (
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div style={{ display: "flex", justifyContent: "space-around" }}>
+                    <Droppable droppableId="list1">
+                        {(provided) => (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                style={{
+                                    border: "1px solid gray",
+                                    padding: "10px",
+                                    width: "40%",
+                                    minHeight: "200px",
+                                }}
+                            >
+                                <h2>List 1</h2>
+                                {items1.map((item, index) => (
+                                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                                        {(provided) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={{
+                                                    userSelect: "none",
+                                                    padding: "16px",
+                                                    margin: "0 0 8px 0",
+                                                    minHeight: "50px",
+                                                    backgroundColor: "#f2f2f2",
+                                                    border: "1px solid gray",
+                                                    ...provided.draggableProps.style,
+                                                }}
+                                            >
+                                                {item.content}
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                    <Droppable droppableId="list2">
+                        {(provided, snapshot) => (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                style={{
+                                    border: "1px solid gray",
+                                    padding: "10px",
+                                    width: "40%",
+                                    minHeight: "200px",
+                                    backgroundColor: snapshot.isDraggingOver ? "#e6e6e6" : "inherit",
+                                }}
+                            >
+                                <h2>List 2</h2>
+                                {items2.map((item, index) => (
+                                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={{
+                                                    userSelect: "none",
+                                                    padding: "16px",
+                                                    margin: "0 0 8px 0",
+                                                    minHeight: "50px",
+                                                    backgroundColor: snapshot.isDragging
+                                                        ? "#263B4A"
+                                                        : "#f2f2f2",
+                                                    color: snapshot.isDragging ? "#fff" : "#000",
+                                                    border: "1px solid gray",
+                                                    ...provided.draggableProps.style,
+                                                }}
+                                            >
+                                               {/* {item.content}*/}
+                                                <TaskItem task={item} index={index} deleteTask={onDelete} />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                                <button onClick={onDeleteAll}>Delete All</button>
+                            </div>
+                        )}
+                    </Droppable>
+                </div>
+            </DragDropContext>
+        );
+    };
+
+
+export default App;

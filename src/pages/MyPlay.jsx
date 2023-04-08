@@ -82,7 +82,7 @@ export default function MyPlay() {
         if (synth.paused && synth.resume) {
             return synth.resume();
         }
-        const utterThis = new SpeechSynthesisUtterance('你好');
+        const utterThis = new SpeechSynthesisUtterance('晚上吃了吗，宝宝');
         utterThis.onend = function (event) {
             console.log('SpeechSynthesisUtterance.onend');
         }
@@ -97,7 +97,7 @@ export default function MyPlay() {
         utterThis.rate = rate;
         utterThis.volume = volume;
         synth.speak(utterThis);
-        //setVoice(utterThis);
+        setVoice(utterThis);
     }
 
     return (
