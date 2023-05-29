@@ -1,6 +1,6 @@
-import React, { Component,useState } from 'react';
-
-import { v4 as uuid } from 'uuid';
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 // import console = require('console');
@@ -155,15 +155,13 @@ const ITEMS = [
     }
 ];
 
-const  App = () => {
-    /*const state = {
+class App extends Component {
+    state = {
         [uuid()]: []
-    };*/
-    const [state, setState] = useState( {
-        [uuid()]: []
-    });
-    const onDragEnd = (result) => {
+    };
+    onDragEnd = result => {
         const { source, destination } = result;
+
         console.log('==> result', result);
 
         // dropped outside the list
@@ -172,33 +170,33 @@ const  App = () => {
         }
 
         switch (source.droppableId) {
-
             case destination.droppableId:
-               setState({
+                console.log("same list")
+                this.setState({
                     [destination.droppableId]: reorder(
-                        state[source.droppableId],
+                        this.state[source.droppableId],
                         source.index,
                         destination.index
                     )
                 });
                 break;
-
             case 'ITEMS':
-                setState({
+                console.log("from items to list")
+                this.setState({
                     [destination.droppableId]: copy(
                         ITEMS,
-                        state[destination.droppableId],
+                        this.state[destination.droppableId],
                         source,
                         destination
                     )
                 });
                 break;
-
             default:
-                setState(
+                console.log("from list to list")
+                this.setState(
                     move(
-                        state[source.droppableId],
-                        state[destination.droppableId],
+                        this.state[source.droppableId],
+                        this.state[destination.droppableId],
                         source,
                         destination
                     )
@@ -207,19 +205,19 @@ const  App = () => {
         }
     };
 
-    const addList = e => {
-        setState({ ...state,[uuid()]: [] });
+    addList = e => {
+        this.setState({ [uuid()]: [] });
     };
 
     // Normally you would want to split things out into separate components.
     // But in this example everything is just done in one place for simplicity
-
+    render() {
         return (
-            <DragDropContext onDragEnd={onDragEnd}>
+            <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable droppableId="ITEMS" isDropDisabled={true}>
                     {(provided, snapshot) => (
                         <Kiosk
-                            ref={provided.innerRef}
+                            innerRef={provided.innerRef}
                             isDraggingOver={snapshot.isDraggingOver}>
                             {ITEMS.map((item, index) => (
                                 <Draggable
@@ -229,7 +227,7 @@ const  App = () => {
                                     {(provided, snapshot) => (
                                         <React.Fragment>
                                             <Item
-                                                ref={provided.innerRef}
+                                                innerRef={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
                                                 isDragging={snapshot.isDragging}
@@ -250,7 +248,7 @@ const  App = () => {
                     )}
                 </Droppable>
                 <Content>
-                    <Button onClick={addList}>
+                    <Button onClick={this.addList}>
                         <svg width="24" height="24" viewBox="0 0 24 24">
                             <path
                                 fill="currentColor"
@@ -259,18 +257,18 @@ const  App = () => {
                         </svg>
                         <ButtonText>Add List</ButtonText>
                     </Button>
-                    {Object.keys(state).map((list, i) => {
+                    {Object.keys(this.state).map((list, i) => {
                         console.log('==> list', list);
                         return (
                             <Droppable key={list} droppableId={list}>
                                 {(provided, snapshot) => (
                                     <Container
-                                        ref={provided.innerRef}
+                                        innerRef={provided.innerRef}
                                         isDraggingOver={
                                             snapshot.isDraggingOver
                                         }>
-                                        {state[list].length
-                                            ? state[list].map(
+                                        {this.state[list].length
+                                            ? this.state[list].map(
                                                 (item, index) => (
                                                     <Draggable
                                                         key={item.id}
@@ -281,7 +279,7 @@ const  App = () => {
                                                             snapshot
                                                         ) => (
                                                             <Item
-                                                                ref={
+                                                                innerRef={
                                                                     provided.innerRef
                                                                 }
                                                                 {...provided.draggableProps}
@@ -325,12 +323,8 @@ const  App = () => {
                 </Content>
             </DragDropContext>
         );
-
+    }
 }
 
-/*
 // Put the things into the DOM!
 ReactDOM.render(<App />, document.getElementById('root'));
-*/
-
-export default App;

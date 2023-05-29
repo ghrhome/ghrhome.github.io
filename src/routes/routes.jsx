@@ -9,6 +9,7 @@ import MuiPlay from "../pages/mui";
 import MyPlay from "../pages/MyPlay";
 import DND from "../pages/dnd";
 import DND3 from "../pages/dnd3";
+import DND4 from "../pages/dnd4";
 import Rxjs from "../pages/rxjs"
 
 export const HomeRouter = () => {
@@ -22,6 +23,7 @@ export const HomeRouter = () => {
             <Route path='/htt' element={<MyPlay/>}/>
             <Route path='/dnd' element={<DND/>}/>
             <Route path='/dnd3' element={<DND3/>}/>
+            <Route path='/dnd4' element={<DND4/>}/>
             <Route path="/rxjs" element={<Rxjs/>} />
         </Routes>
 

@@ -24,27 +24,33 @@ const App = () => {
 
     const onDragEnd = (result) => {
         const { source, destination } = result;
+        console.log(source,destination)
 
         if (!destination) {
             return;
         }
 
         if (source.droppableId === destination.droppableId) {
+
             const items = reorderList(
                 getItemList(source.droppableId),
                 source.index,
                 destination.index
             );
+
             setItemList(source.droppableId, items);
+
         } else {
             const sourceItems = getItemList(source.droppableId);
             const destItems = getItemList(destination.droppableId);
 
             if (source.droppableId === "list1") {
+                console.log("list1")
                 const item = sourceItems[source.index];
                 const newItem = { ...item, id: uuidv4() };
                 setItems2((items) => [...items, newItem]);
             } else {
+                console.log("list2 ===============")
                 const result = moveItem(sourceItems, destItems, source, destination);
                 setItemList(source.droppableId, result[source.droppableId]);
                 setItemList(destination.droppableId, result[destination.droppableId]);
@@ -61,9 +67,13 @@ const App = () => {
     };
 
     const setItemList = (id, items) => {
+        console.log(id, items);
         if (id === "list1") {
+            console.log("return")
+            //setItems1(items);
             return;
         }
+        console.log("set 2====")
         setItems2(items);
     };
 
@@ -104,23 +114,36 @@ const App = () => {
                                 <h2>List 1</h2>
                                 {items1.map((item, index) => (
                                     <Draggable key={item.id} draggableId={item.id} index={index}>
-                                        {(provided) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={{
-                                                    userSelect: "none",
-                                                    padding: "16px",
-                                                    margin: "0 0 8px 0",
-                                                    minHeight: "50px",
-                                                    backgroundColor: "#f2f2f2",
-                                                    border: "1px solid gray",
-                                                    ...provided.draggableProps.style,
-                                                }}
-                                            >
-                                                {item.content}
-                                            </div>
+                                        {(provided,snapshot) => (
+                                            <React.Fragment>
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={{
+                                                        userSelect: "none",
+                                                        padding: "16px",
+                                                        margin: "0 0 8px 0",
+                                                        minHeight: "50px",
+                                                        backgroundColor: "#f2f2f2",
+                                                        border: "1px solid gray",
+                                                        ...provided.draggableProps.style,
+                                                    }}
+                                                >
+                                                    {item.content}
+                                                </div>
+                                                {snapshot.isDragging && (
+                                                    <div style={{
+                                                        userSelect: "none",
+                                                        padding: "16px",
+                                                        margin: "0 0 8px 0",
+                                                        minHeight: "50px",
+                                                        backgroundColor: "#f2f2f2",
+                                                        border: "1px solid gray",
+                                                    }}>{item.content}</div>
+                                                )}
+                                            </React.Fragment>
+
                                         )}
                                     </Draggable>
                                 ))}
@@ -142,6 +165,16 @@ const App = () => {
                                 }}
                             >
                                 <h2>List 2</h2>
+
+
+                               {/* <Draggable > {(provided, snapshot) => (
+                                    <> <MyItemDraggable/>
+                                    {snapshot.isDragging ?
+                                        <MyItemDraggable className={`dnd-copy`} /> : null}
+                                    </>)}
+                                </Draggable>*/}
+
+
                                 {items2.map((item, index) => (
                                     <Draggable key={item.id} draggableId={item.id} index={index}>
                                         {(provided, snapshot) => (
@@ -164,6 +197,7 @@ const App = () => {
                                             >
                                                {/* {item.content}*/}
                                                 <TaskItem task={item} index={index} deleteTask={onDelete} />
+
                                             </div>
                                         )}
                                     </Draggable>
