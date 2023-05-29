@@ -161,7 +161,6 @@ class App extends Component {
     };
     onDragEnd = result => {
         const { source, destination } = result;
-
         console.log('==> result', result);
 
         // dropped outside the list
