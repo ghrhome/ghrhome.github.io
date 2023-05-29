@@ -19,7 +19,7 @@ const TaskItem = ({ task, index, deleteTask }) => {
 };
 
 const App = () => {
-    const [items1] = useState(initialItems);
+    const [items1, setItems1] = useState(initialItems);
     const [items2, setItems2] = useState([]);
 
     const onDragEnd = (result) => {
